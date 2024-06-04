@@ -7,15 +7,13 @@ const OrderDetailManagement = () => {
     const [newOrderDetail, setNewOrderDetail] = useState({
         OrderID: '',
         ProductID: '',
-        Quantity: '',
-        DetailDate: ''
+        Quantity: ''
     });
     const [updateOrderDetail, setUpdateOrderDetail] = useState({
         OrderDetailID: '',
         OrderID: '',
         ProductID: '',
-        Quantity: '',
-        DetailDate: ''
+        Quantity: ''
     });
 
     useEffect(() => {
@@ -50,8 +48,7 @@ const OrderDetailManagement = () => {
                 setNewOrderDetail({
                     OrderID: '',
                     ProductID: '',
-                    Quantity: '',
-                    DetailDate: ''
+                    Quantity: ''
                 });
                 fetchOrderDetails();
             })
@@ -69,8 +66,7 @@ const OrderDetailManagement = () => {
                     OrderDetailID: '',
                     OrderID: '',
                     ProductID: '',
-                    Quantity: '',
-                    DetailDate: ''
+                    Quantity: ''
                 });
                 fetchOrderDetails();
             })
@@ -127,16 +123,6 @@ const OrderDetailManagement = () => {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="DetailDate">
-                            <Form.Label>Detail Date</Form.Label>
-                            <Form.Control
-                                type="date"
-                                name="DetailDate"
-                                value={newOrderDetail.DetailDate}
-                                onChange={handleNewOrderDetailChange}
-                                required
-                            />
-                        </Form.Group>
                         <Button variant="primary" type="submit">Add Order Detail</Button>
                     </Form>
                 </Col>
@@ -183,16 +169,6 @@ const OrderDetailManagement = () => {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="DetailDate">
-                            <Form.Label>Detail Date</Form.Label>
-                            <Form.Control
-                                type="date"
-                                name="DetailDate"
-                                value={updateOrderDetail.DetailDate}
-                                onChange={handleUpdateOrderDetailChange}
-                                required
-                            />
-                        </Form.Group>
                         <Button variant="primary" type="submit">Update Order Detail</Button>
                     </Form>
                 </Col>
@@ -205,7 +181,7 @@ const OrderDetailManagement = () => {
                         <th>Order ID</th>
                         <th>Product ID</th>
                         <th>Quantity</th>
-                        <th>Detail Date</th>
+                        <th>Price</th>  {/* Update this line */}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -216,7 +192,7 @@ const OrderDetailManagement = () => {
                             <td>{orderDetail.OrderID}</td>
                             <td>{orderDetail.ProductID}</td>
                             <td>{orderDetail.Quantity}</td>
-                            <td>{orderDetail.DetailDate}</td>
+                            <td>{orderDetail.Price}</td>  {/* Update this line */}
                             <td>
                                 <Button variant="danger" onClick={() => handleDeleteOrderDetail(orderDetail.OrderDetailID)}>Delete</Button>
                             </td>
