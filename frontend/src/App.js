@@ -7,6 +7,8 @@ import ProductManagement from './components/ProductManagement';
 import OrderManagement from './components/OrderManagement';
 import OrderDetailManagement from './components/OrderDetailManagement';
 import InventoryRestockManagement from './components/InventoryRestockManagement';
+import Dashboard from './components/Dashboard';
+
 
 const App = () => {
     return (
@@ -19,6 +21,7 @@ const App = () => {
                     <Route path="/orders" element={<OrderManagement />} />
                     <Route path="/orderdetails" element={<OrderDetailManagement />} />
                     <Route path="/inventoryrestocks" element={<InventoryRestockManagement />} />
+                    <Route path="/" element={<Dashboard />} />
                 </Routes>
             </Layout>
         </Router>

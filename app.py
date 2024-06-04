@@ -44,7 +44,7 @@ class OrderDetail(db.Model):
     OrderID = db.Column(db.Integer, db.ForeignKey('order.OrderID'))
     ProductID = db.Column(db.Integer, db.ForeignKey('product.ProductID'))
     Quantity = db.Column(db.Integer)
-    DetailDate = db.Column(db.Date)
+    Price = db.Column(db.Float)
 
 class InventoryRestock(db.Model):
     InventoryRestockID = db.Column(db.Integer, primary_key=True)
@@ -56,26 +56,32 @@ class InventoryRestock(db.Model):
 class SupplierSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Supplier
+        include_fk = True
 
 class CustomerSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Customer
+        include_fk = True
 
 class ProductSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Product
+        include_fk = True
 
 class OrderSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Order
+        include_fk = True
 
 class OrderDetailSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = OrderDetail
+        include_fk = True
 
 class InventoryRestockSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = InventoryRestock
+        include_fk = True
 
 supplier_schema = SupplierSchema()
 suppliers_schema = SupplierSchema(many=True)
@@ -112,7 +118,10 @@ def add_supplier():
 @app.route('/suppliers/<int:id>', methods=['PUT'])
 def update_supplier(id):
     data = request.json
-    supplier = Supplier.query.get(id)
+    supplier = db.session.get(Supplier, id)
+    if not supplier:
+        return jsonify({"error": "Supplier not found"}), 404
+
     supplier.Name = data['Name']
     supplier.ContactName = data['ContactName']
     supplier.PhoneNumber = data['PhoneNumber']
@@ -127,7 +136,10 @@ def get_suppliers():
 
 @app.route('/suppliers/<int:id>', methods=['DELETE'])
 def delete_supplier(id):
-    supplier = Supplier.query.get(id)
+    supplier = db.session.get(Supplier, id)
+    if not supplier:
+        return jsonify({"error": "Supplier not found"}), 404
+
     db.session.delete(supplier)
     db.session.commit()
     return supplier_schema.jsonify(supplier)
@@ -148,7 +160,10 @@ def add_customer():
 @app.route('/customers/<int:id>', methods=['PUT'])
 def update_customer(id):
     data = request.json
-    customer = Customer.query.get(id)
+    customer = db.session.get(Customer, id)
+    if not customer:
+        return jsonify({"error": "Customer not found"}), 404
+
     customer.FirstName = data['FirstName']
     customer.LastName = data['LastName']
     customer.Email = data['Email']
@@ -163,7 +178,10 @@ def get_customers():
 
 @app.route('/customers/<int:id>', methods=['DELETE'])
 def delete_customer(id):
-    customer = Customer.query.get(id)
+    customer = db.session.get(Customer, id)
+    if not customer:
+        return jsonify({"error": "Customer not found"}), 404
+
     db.session.delete(customer)
     db.session.commit()
     return customer_schema.jsonify(customer)
@@ -185,7 +203,10 @@ def add_product():
 @app.route('/products/<int:id>', methods=['PUT'])
 def update_product(id):
     data = request.json
-    product = Product.query.get(id)
+    product = db.session.get(Product, id)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
     product.Name = data['Name']
     product.Category = data['Category']
     product.Price = data['Price']
@@ -201,7 +222,10 @@ def get_products():
 
 @app.route('/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
-    product = Product.query.get(id)
+    product = db.session.get(Product, id)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
     db.session.delete(product)
     db.session.commit()
     return product_schema.jsonify(product)
@@ -221,7 +245,10 @@ def add_order():
 @app.route('/orders/<int:id>', methods=['PUT'])
 def update_order(id):
     data = request.json
-    order = Order.query.get(id)
+    order = db.session.get(Order, id)
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
     order.CustomerID = data['CustomerID']
     order.OrderDate = datetime.strptime(data['OrderDate'], '%Y-%m-%d').date()
     order.TotalAmount = data['TotalAmount']
@@ -235,7 +262,10 @@ def get_orders():
 
 @app.route('/orders/<int:id>', methods=['DELETE'])
 def delete_order(id):
-    order = Order.query.get(id)
+    order = db.session.get(Order, id)
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
     db.session.delete(order)
     db.session.commit()
     return order_schema.jsonify(order)
@@ -243,11 +273,15 @@ def delete_order(id):
 @app.route('/orderdetails', methods=['POST'])
 def add_order_detail():
     data = request.json
+    product = db.session.get(Product, data['ProductID'])
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
     new_order_detail = OrderDetail(
         OrderID=data['OrderID'],
         ProductID=data['ProductID'],
         Quantity=data['Quantity'],
-        DetailDate=datetime.strptime(data['DetailDate'], '%Y-%m-%d').date()
+        Price=product.Price  # Use the price from the Product table
     )
     db.session.add(new_order_detail)
     db.session.commit()
@@ -256,11 +290,18 @@ def add_order_detail():
 @app.route('/orderdetails/<int:id>', methods=['PUT'])
 def update_order_detail(id):
     data = request.json
-    order_detail = OrderDetail.query.get(id)
+    order_detail = db.session.get(OrderDetail, id)
+    if not order_detail:
+        return jsonify({"error": "OrderDetail not found"}), 404
+
+    product = db.session.get(Product, data['ProductID'])
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
     order_detail.OrderID = data['OrderID']
     order_detail.ProductID = data['ProductID']
     order_detail.Quantity = data['Quantity']
-    order_detail.DetailDate = datetime.strptime(data['DetailDate'], '%Y-%m-%d').date()
+    order_detail.Price = product.Price  # Use the price from the Product table
     db.session.commit()
     return order_detail_schema.jsonify(order_detail)
 
@@ -271,7 +312,10 @@ def get_order_details():
 
 @app.route('/orderdetails/<int:id>', methods=['DELETE'])
 def delete_order_detail(id):
-    order_detail = OrderDetail.query.get(id)
+    order_detail = db.session.get(OrderDetail, id)
+    if not order_detail:
+        return jsonify({"error": "OrderDetail not found"}), 404
+
     db.session.delete(order_detail)
     db.session.commit()
     return order_detail_schema.jsonify(order_detail)
@@ -291,7 +335,10 @@ def add_inventory_restock():
 @app.route('/inventoryrestocks/<int:id>', methods=['PUT'])
 def update_inventory_restock(id):
     data = request.json
-    inventory_restock = InventoryRestock.query.get(id)
+    inventory_restock = db.session.get(InventoryRestock, id)
+    if not inventory_restock:
+        return jsonify({"error": "InventoryRestock not found"}), 404
+
     inventory_restock.ProductID = data['ProductID']
     inventory_restock.Quantity = data['Quantity']
     inventory_restock.RestockDate = datetime.strptime(data['RestockDate'], '%Y-%m-%d').date()
@@ -305,7 +352,10 @@ def get_inventory_restocks():
 
 @app.route('/inventoryrestocks/<int:id>', methods=['DELETE'])
 def delete_inventory_restock(id):
-    inventory_restock = InventoryRestock.query.get(id)
+    inventory_restock = db.session.get(InventoryRestock, id)
+    if not inventory_restock:
+        return jsonify({"error": "InventoryRestock not found"}), 404
+
     db.session.delete(inventory_restock)
     db.session.commit()
     return inventory_restock_schema.jsonify(inventory_restock)
