@@ -14,10 +14,6 @@ The Product Management System is a web application designed to manage suppliers,
   - [Components](#components)
   - [Styling](#styling)
 - [Setup and Installation](#setup-and-installation)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Backend (API) Overview
 
@@ -109,4 +105,48 @@ The application uses Bootstrap for basic styling and layout, ensuring a responsi
    ```bash
    git clone https://github.com/AnthonySalazar09/Database_Project.git
    cd Database_Project
+2. **Create a Virtual Environment**
+   ```bash
+   python -m venv venv
+
+3. **Activate the Virtual Environment**
+   On Windows:
+   ```bash
+    venv\Scripts\activate
+4. Set Up the Database:
+   Ensure MySQL is installed and running on your system.
+   Create a database named projectdb in MySQL.
+   Update the database connection string in the app.py file if necessary.
+5. Initialize the Database:
+  Run the following commands to create and migrate the database schema:
+    ```bash
+    flask db init
+    flask db migrate -m "Initial migration."
+    flask db upgrade
+
+6. Run the Backend Server:
+    Run the following command:
+    ```bash
+    flask run
+
+###Frontend Setup
+
+1. Navigate to the Frontend Directory:
+In the terminal or command prompt, run the following command:
+
+    ```bash
+    cd frontend
+2. Install Frontend Dependencies:
+Run the following command:
+
+    ```bash
+    npm install
+3. Start the React Development Server:
+Run the following command:
+
+    ```bash
+    npm start
+4. Access the Application:
+Open a web browser and navigate to http://localhost:3000.
+
 
