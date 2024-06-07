@@ -6,14 +6,12 @@ const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
     const [newOrder, setNewOrder] = useState({
         CustomerID: '',
-        OrderDate: '',
-        TotalAmount: ''
+        OrderDate: ''
     });
     const [updateOrder, setUpdateOrder] = useState({
         OrderID: '',
         CustomerID: '',
-        OrderDate: '',
-        TotalAmount: ''
+        OrderDate: ''
     });
 
     useEffect(() => {
@@ -47,8 +45,7 @@ const OrderManagement = () => {
                 alert('Order added successfully!');
                 setNewOrder({
                     CustomerID: '',
-                    OrderDate: '',
-                    TotalAmount: ''
+                    OrderDate: ''
                 });
                 fetchOrders();
             })
@@ -65,8 +62,7 @@ const OrderManagement = () => {
                 setUpdateOrder({
                     OrderID: '',
                     CustomerID: '',
-                    OrderDate: '',
-                    TotalAmount: ''
+                    OrderDate: ''
                 });
                 fetchOrders();
             })
@@ -113,16 +109,6 @@ const OrderManagement = () => {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="TotalAmount">
-                            <Form.Label>Total Amount</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="TotalAmount"
-                                value={newOrder.TotalAmount}
-                                onChange={handleNewOrderChange}
-                                required
-                            />
-                        </Form.Group>
                         <Button variant="primary" type="submit">Add Order</Button>
                     </Form>
                 </Col>
@@ -155,16 +141,6 @@ const OrderManagement = () => {
                                 type="date"
                                 name="OrderDate"
                                 value={updateOrder.OrderDate}
-                                onChange={handleUpdateOrderChange}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="TotalAmount">
-                            <Form.Label>Total Amount</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="TotalAmount"
-                                value={updateOrder.TotalAmount}
                                 onChange={handleUpdateOrderChange}
                                 required
                             />

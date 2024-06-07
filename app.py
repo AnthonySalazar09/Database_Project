@@ -37,7 +37,11 @@ class Order(db.Model):
     OrderID = db.Column(db.Integer, primary_key=True)
     CustomerID = db.Column(db.Integer, db.ForeignKey('customer.CustomerID'))
     OrderDate = db.Column(db.Date)
-    TotalAmount = db.Column(db.Float)
+    order_details = db.relationship('OrderDetail', backref='order', lazy=True)
+
+    @property
+    def TotalAmount(self):
+        return sum([detail.Quantity * detail.Price for detail in self.order_details])
 
 class OrderDetail(db.Model):
     OrderDetailID = db.Column(db.Integer, primary_key=True)
@@ -69,9 +73,14 @@ class ProductSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
 
 class OrderSchema(ma.SQLAlchemyAutoSchema):
+    TotalAmount = ma.Method("get_total_amount")
+
     class Meta:
         model = Order
         include_fk = True
+
+    def get_total_amount(self, obj):
+        return obj.TotalAmount
 
 class OrderDetailSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -235,8 +244,7 @@ def add_order():
     data = request.json
     new_order = Order(
         CustomerID=data['CustomerID'],
-        OrderDate=datetime.strptime(data['OrderDate'], '%Y-%m-%d').date(),
-        TotalAmount=data['TotalAmount']
+        OrderDate=datetime.strptime(data['OrderDate'], '%Y-%m-%d').date()
     )
     db.session.add(new_order)
     db.session.commit()
@@ -251,7 +259,6 @@ def update_order(id):
 
     order.CustomerID = data['CustomerID']
     order.OrderDate = datetime.strptime(data['OrderDate'], '%Y-%m-%d').date()
-    order.TotalAmount = data['TotalAmount']
     db.session.commit()
     return order_schema.jsonify(order)
 
@@ -272,10 +279,13 @@ def delete_order(id):
 
 @app.route('/orderdetails', methods=['POST'])
 def add_order_detail():
-    data = request.json
+    data = request.get_json()
     product = db.session.get(Product, data['ProductID'])
     if not product:
-        return jsonify({"error": "Product not found"}), 404
+        return jsonify({'error': 'Product not found'}), 404
+
+    if product.QuantityInStock < data['Quantity']:
+        return jsonify({'error': 'Not enough stock available'}), 400
 
     new_order_detail = OrderDetail(
         OrderID=data['OrderID'],
@@ -283,20 +293,30 @@ def add_order_detail():
         Quantity=data['Quantity'],
         Price=product.Price  # Use the price from the Product table
     )
+    product.QuantityInStock -= data['Quantity']
     db.session.add(new_order_detail)
     db.session.commit()
     return order_detail_schema.jsonify(new_order_detail)
 
 @app.route('/orderdetails/<int:id>', methods=['PUT'])
 def update_order_detail(id):
-    data = request.json
+    data = request.get_json()
     order_detail = db.session.get(OrderDetail, id)
     if not order_detail:
-        return jsonify({"error": "OrderDetail not found"}), 404
+        return jsonify({'error': 'OrderDetail not found'}), 404
 
     product = db.session.get(Product, data['ProductID'])
     if not product:
-        return jsonify({"error": "Product not found"}), 404
+        return jsonify({'error': 'Product not found'}), 404
+
+    if data['Quantity'] > order_detail.Quantity:
+        difference = data['Quantity'] - order_detail.Quantity
+        if product.QuantityInStock < difference:
+            return jsonify({'error': 'Not enough stock available'}), 400
+        product.QuantityInStock -= difference
+    else:
+        difference = order_detail.Quantity - data['Quantity']
+        product.QuantityInStock += difference
 
     order_detail.OrderID = data['OrderID']
     order_detail.ProductID = data['ProductID']
@@ -314,8 +334,10 @@ def get_order_details():
 def delete_order_detail(id):
     order_detail = db.session.get(OrderDetail, id)
     if not order_detail:
-        return jsonify({"error": "OrderDetail not found"}), 404
+        return jsonify({'error': 'OrderDetail not found'}), 404
 
+    product = db.session.get(Product, order_detail.ProductID)
+    product.QuantityInStock += order_detail.Quantity
     db.session.delete(order_detail)
     db.session.commit()
     return order_detail_schema.jsonify(order_detail)
