@@ -9,6 +9,7 @@ The Product Management System is a web application designed to manage suppliers,
 - [Project Overview](#project-overview)
 - [Backend (API) Overview](#backend-api-overview)
   - [API Endpoints](#api-endpoints)
+  - [Stock Management](#stock-management)
 - [Frontend (React) Overview](#frontend-react-overview)
   - [Components](#components)
   - [Styling](#styling)
@@ -62,6 +63,13 @@ Below are the main API endpoints provided by the Flask backend:
   - `PUT /inventoryrestocks/<id>`: Update an existing inventory restock.
   - `DELETE /inventoryrestocks/<id>`: Delete an inventory restock.
 
+### Stock Management
+
+The system includes functionality to manage stock levels effectively:
+- **Decrease `QuantityInStock`**: When an order detail is added or updated, the system decreases the product's `QuantityInStock` accordingly.
+- **Increase `QuantityInStock`**: When an order detail is deleted, the system increases the product's `QuantityInStock`.
+- **Error Handling**: The system ensures there is sufficient stock available before adding or updating order details and provides appropriate error messages if not.
+
 ## Frontend (React) Overview
 
 The frontend of the Product Management System is built using React, a JavaScript library for building user interfaces. The application consists of several components, each responsible for managing a different aspect of the system.
@@ -84,7 +92,7 @@ The frontend of the Product Management System is built using React, a JavaScript
   - Manages the orders in the system, allowing for the creation, update, and deletion of orders.
 
 - **OrderDetailManagement**
-  - Manages the order details in the system, allowing for the creation, update, and deletion of order details.
+  - Manages the order details in the system, allowing for the creation, update, and deletion of order details. It also ensures that product stock levels are updated accordingly.
 
 - **InventoryRestockManagement**
   - Manages the inventory restocks in the system, allowing for the creation, update, and deletion of inventory restocks.
@@ -101,3 +109,4 @@ The application uses Bootstrap for basic styling and layout, ensuring a responsi
    ```bash
    git clone https://github.com/AnthonySalazar09/Database_Project.git
    cd Database_Project
+
