@@ -129,7 +129,7 @@ The application uses Bootstrap for basic styling and layout, ensuring a responsi
     ```bash
     flask run
 
-###Frontend Setup
+### Frontend Setup
 
 1. Navigate to the Frontend Directory:
 In the terminal or command prompt, run the following command:
